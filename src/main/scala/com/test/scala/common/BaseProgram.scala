@@ -3,6 +3,7 @@ package com.test.scala.common
 import java.util.Properties
 
 import backtype.storm.generated.StormTopology
+import backtype.storm.topology.TopologyBuilder
 import backtype.storm.{Config, LocalCluster, StormSubmitter}
 import com.test.scala.util.ParamUtils
 
@@ -20,10 +21,10 @@ class BaseProgram extends App {
   var zkKafkaStormMap:Map[String,String] = _
 
   val conf:Config = new Config()
+  lazy val builder = new TopologyBuilder()
 
   def init(): Unit ={
     mainArgsMap = ParamUtils.jsonStrToMap(args.mkString("")).asInstanceOf[Map[String,String]]
-    fixedParamMap = ParamUtils.getClassPathFileContent("fixed-params.conf")
     delayedInit(submitTopology())
   }
 
@@ -31,12 +32,12 @@ class BaseProgram extends App {
     runPattern = mainArgsMap.getOrElse("run_pattern","")
     topic = mainArgsMap.getOrElse("topic","")
 
-    val testOrProductParamMap = if(runPattern==runPatternMap.get(1).get || runPattern==runPatternMap.get(2).get){
-      fixedParamMap.get(runPatternMap.get(2).get).get.asInstanceOf[Map[String,Any]]
+    fixedParamMap = if(runPattern==runPatternMap.get(1).get || runPattern==runPatternMap.get(2).get){
+      ParamUtils.getClassPathFileContent("fixed-params.conf").get(runPatternMap.get(2).get).get.asInstanceOf[Map[String,Any]]
     }else{
-      fixedParamMap.get(runPatternMap.get(3).get).get.asInstanceOf[Map[String,Any]]
+      ParamUtils.getClassPathFileContent("fixed-params.conf").get(runPatternMap.get(3).get).get.asInstanceOf[Map[String,Any]]
     }
-    zkKafkaStormMap = testOrProductParamMap.get("zk_kafka_storm").get.asInstanceOf[Map[String,String]]
+    zkKafkaStormMap = fixedParamMap.get("zk_kafka_storm").get.asInstanceOf[Map[String,String]]
 
     getConfig()
   }

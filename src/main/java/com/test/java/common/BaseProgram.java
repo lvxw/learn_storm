@@ -44,20 +44,18 @@ public abstract class BaseProgram {
             sb.append(args[i]);
         }
         mainArgsMap = ParamUtils.jsonStrToMap(sb.toString());
-        fixedParamMap = ParamUtils.getClassPathFileContent("fixed-params.conf");
     }
 
     public void initParams(BaseProgram program){
         runPattern = (String) mainArgsMap.get("run_pattern");
         topic = (String) mainArgsMap.get("topic");
 
-        Map<String,Object> testOrProductParamMap;
         if(runPattern.equals(runPatternArr[0]) || runPattern.equals(runPatternArr[1])){
-            testOrProductParamMap = (Map<String, Object>) fixedParamMap.get(runPatternArr[1]);
+            fixedParamMap = (Map<String, Object>) ParamUtils.getClassPathFileContent("fixed-params.conf").get(runPatternArr[1]);
         }else{
-            testOrProductParamMap = (Map<String, Object>) fixedParamMap.get(runPatternArr[2]);
+            fixedParamMap = (Map<String, Object>) ParamUtils.getClassPathFileContent("fixed-params.conf").get(runPatternArr[2]);
         }
-        zkKafkaStormMap = (Map<String, String>) testOrProductParamMap.get("zk_kafka_storm");
+        zkKafkaStormMap = (Map<String, String>) fixedParamMap.get("zk_kafka_storm");
 
         program.getConf();
     }

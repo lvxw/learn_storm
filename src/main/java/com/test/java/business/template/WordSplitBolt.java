@@ -11,14 +11,15 @@ import backtype.storm.tuple.Values;
  * @author lvxw
  */
 public class WordSplitBolt extends BaseBasicBolt {
+
     @Override
     public void execute(Tuple input, BasicOutputCollector collector) {
         String lineStr = input.getString(0);
         String[] wordArr = lineStr.split(" ");
-
-        for(String word: wordArr){
+        for(String word:wordArr){
             collector.emit(new Values(word));
         }
+
     }
 
     @Override
